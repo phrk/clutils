@@ -7,7 +7,7 @@
 
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
-			:flatten :sha1-hash :unix-time :bytes-to-string)
+			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -77,6 +77,9 @@
 (defun bytes-to-string (arr)
 	(flexi-streams:octets-to-string arr :external-format :utf-8))
 
+(defun remove-symbols (str)
+	(string-trim " " (remove-if-not #'(lambda (s) (or (alphanumericp s)  (equal #\Space s) )) str)))
+	
 ;(setf val nil)
 
 ;(setf cond (bordeaux-threads:make-condition-variable))

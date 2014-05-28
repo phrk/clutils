@@ -1,5 +1,6 @@
 (load "clutils/utils.lisp")
 (ql:quickload :drakma)
+(ql:quickload :yason)
 
 (defpackage :utils
 	(:export :http-api-client-class :call-signed)
@@ -40,7 +41,7 @@
 
 (defmethod call-signed ((api http-api-client-class) method params)
 	(let ((url (build-url-signed api method params)))
-		(format t "BUILDURL: ~A ~%" url)
+		;(format t "BUILDURL: ~A ~%" url)
 		(drakma:http-request url )))
 
 
