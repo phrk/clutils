@@ -50,10 +50,23 @@
 		      								(dispatch-table (listener-srv lstnr)))))
 	(tbnl:start (listener-srv lstnr)))
 
+(defun remove-parent-dir(path)
+	(setf path (subseq path 1 (length path)) )
+	(subseq path (search "/" path) (length path) ) )
+
+(defun get-req-path (url path)
+	(setf b (search path url))
+	(setf e (- (length url) 1))
+
+	(setf q (search "?" url))
+	(if q
+		(subseq url b q)
+		(subseq url b q)))
+
 (defmethod make-file-listener(uriprefix dir)
 	#'(lambda (req)
 		(let* ((uri (tbnl:request-uri req))
-				(filepath (concatenate 'string dir (subseq uri  (length uriprefix)) )))
+				(filepath (concatenate 'string dir (remove-parent-dir (get-req-path uri uriprefix)) )))
 			(format t "GETTING FILE: ~A~%" filepath)
 			(tbnl:handle-static-file filepath ))))
 

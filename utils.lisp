@@ -78,7 +78,7 @@
 	(flexi-streams:octets-to-string arr :external-format :utf-8))
 
 (defun remove-symbols (str)
-	(string-trim " " (remove-if-not #'(lambda (s) (or (alphanumericp s)  (equal #\Space s) )) str)))
+	(string-trim " " (remove-if-not #'(lambda (s) (or (alphanumericp s)  (equal #\Space s) (equal #\. s)  )) str)))
 	
 ;(setf val nil)
 
