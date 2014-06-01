@@ -3,7 +3,7 @@
 (ql:quickload :yason)
 
 (defpackage :utils
-	(:export :http-api-client-class :call-signed :call)
+	(:export :http-api-client-class :call-signed :call :build-url)
 	(:use :common-lisp)
 )
 
