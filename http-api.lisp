@@ -1,3 +1,8 @@
+(load "clutils/utils.lisp")
+
+(ql:quickload :do-urlencode)
+(ql:quickload :hunchentoot)
+
 (defpackage :utils
 	(:export :http-api-class :add-user :add-api-method :add-api-method-signed :handle-request)
 	(:use :common-lisp)
@@ -51,7 +56,7 @@
 		
 		(utils:iterate-array (gethash method (methods-args api)) 
 							#'(lambda (arg) (if (null (gethash arg fields))
-												(return-from check-fields nil) ) ) ) 
+												(return-from check-fields nil))))
 		
 		(if (not (signedp api method))
 			(return-from check-fields t))
@@ -72,7 +77,7 @@
 
 (defmethod handle-request((api http-api-class) req)
 	(let ((fields (make-hash-table :test #'equal)))
-		(mapcar #'(lambda (a) (setf (gethash (car a) fields) (cdr a))) (tbnl:get-parameters req))
+		(mapcar #'(lambda (a) (setf (gethash (car a) fields) (hunchentoot:url-decode (cdr a)) )) (tbnl:get-parameters req))
 		(if (not (check-fields api fields))
 			(funcall (get-auth-error api))
 			(funcall (gethash (gethash "method" fields) (methods-callbacks api)) fields))))
