@@ -28,13 +28,13 @@
 			(sign (sha1-hash sign_raw))
 			(req-url (format nil "~A?method=~A&api_userid=~A&ts=~A&sign=~A" (url api) method (api-userid api) ts sign)))
 				(maphash #'(lambda (k v)
-									(setf req-url (format nil "~A&~A=~A" req-url k (drakma:url-encode v :utf-8)))) params)
+									(setf req-url (format nil "~A&~A=~A" req-url k (drakma:url-encode (format nil "~A" v) :utf-8)))) params)
 										(return-from build-url-signed req-url)))
 
 (defmethod build-url((api http-api-client-class) method params)
 	(let* ((req-url (format nil "~A?method=~A&api_userid=~A" (url api) method (api-userid api))))
 				(maphash #'(lambda (k v)
-									(setf req-url  (format nil "~A&~A=~A" req-url k (drakma:url-encode v :utf-8)))) params)
+									(setf req-url  (format nil "~A&~A=~A" req-url k (drakma:url-encode (format nil "~A" v) :utf-8)))) params)
 										(return-from build-url req-url)))
 
 (defmethod call ((api http-api-client-class) method params)
