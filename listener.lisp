@@ -18,7 +18,8 @@
 		:documentation "List of dispatch functions"))
   ;; options
 	(:default-initargs                    ; default-initargs must be used
-	:address "127.0.0.1"))               ; because ACCEPTOR uses it
+;	:address "127.0.0.1"
+	))               ; because ACCEPTOR uses it
 
 ;;; Specialise ACCEPTOR-DISPATCH-REQUEST for VHOSTs
 (defmethod tbnl:acceptor-dispatch-request ((vhost vhost) request)

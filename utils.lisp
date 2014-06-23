@@ -1,16 +1,18 @@
 (ql:quickload "bordeaux-threads")
 (ql:quickload :ironclad)
-
+(ql:quickload :postmodern)
 (load "clutils/queue.lisp")
 (ql:quickload "local-time")
 (ql:quickload :flexi-streams)
 
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
-			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols)
+			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery)
 	(:use :common-lisp))
 
 (in-package :utils)
+
+(defparameter *dblock* (bordeaux-threads:make-lock "db-lock"))
 
 (defun make-smart-vec ()
 	(make-array 1 :fill-pointer 0 :adjustable t))
@@ -23,9 +25,15 @@
 	
 (defun with-lock (lock fn)
 	(bordeaux-threads:acquire-lock lock)
-	(setf ret (funcall fn))
+	(handler-case
+		(progn
+			(setf ret (funcall fn))
+		;(format t "with-lock ret ~A~%" ret)
+			(bordeaux-threads:release-lock lock)
+			(return-from with-lock ret))
+	(error (cnd) (print "with lock error~%")))
 	(bordeaux-threads:release-lock lock)
-	(return-from with-lock ret))
+	nil)
 
 (defun cond-wait (condvar lock check-reached reset-condition)
 	(bordeaux-threads:acquire-lock lock)
@@ -80,6 +88,16 @@
 (defun remove-symbols (str)
 	(string-trim " " (remove-if-not #'(lambda (s) (or (alphanumericp s)  (equal #\Space s) (equal #\. s)  )) str)))
 	
+(defun dbquery (q)
+	(setf ret nil)
+	;(handler-case
+		
+		(with-lock *dblock* #'(lambda ()
+			(setf ret (postmodern:query q))))
+			
+	;(error (cnd) (print "dbquery error")))
+	;(format nil "dbquery ret ~A~%" ret)
+	ret)
 ;(setf val nil)
 
 ;(setf cond (bordeaux-threads:make-condition-variable))
