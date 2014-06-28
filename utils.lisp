@@ -7,7 +7,7 @@
 
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
-			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery)
+			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -98,6 +98,16 @@
 	;(error (cnd) (print "dbquery error")))
 	;(format nil "dbquery ret ~A~%" ret)
 	ret)
+	
+	
+(defun list-conc-prefixes (lst prefix)
+	(let ((newlist_absolute '()))	
+		(mapcar #'(lambda (css_rel)
+					(setf newlist_absolute (cons (format nil "~A~A" prefix css_rel)
+												newlist_absolute) )) 
+				lst)
+		newlist_absolute))
+	
 ;(setf val nil)
 
 ;(setf cond (bordeaux-threads:make-condition-variable))
