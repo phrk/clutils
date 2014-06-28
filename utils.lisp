@@ -106,7 +106,7 @@
 					(setf newlist_absolute (cons (format nil "~A~A" prefix css_rel)
 												newlist_absolute) )) 
 				lst)
-		newlist_absolute))
+		(reverse newlist_absolute)))
 	
 ;(setf val nil)
 
