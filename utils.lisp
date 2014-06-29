@@ -7,7 +7,7 @@
 
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
-			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes)
+			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -107,6 +107,19 @@
 												newlist_absolute) )) 
 				lst)
 		(reverse newlist_absolute)))
+
+(defun round-minutes (ts)
+	(* 3600 (truncate (/ (utils:unix-time) 3600))))
+
+(defun unix-time-to-hour-min-str (ts)
+	(let ((localtime (local-time:unix-to-timestamp ts))
+		(hour 0)
+		(min 0))
+		(local-time:with-decoded-timestamp (:minute min :hour hour) localtime
+			(if (equal min 0)
+				(format nil "~A:00" hour)
+				(format nil "~A:~A" hour min ) ))))
+		
 	
 ;(setf val nil)
 
