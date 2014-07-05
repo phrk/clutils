@@ -4,10 +4,12 @@
 (load "clutils/queue.lisp")
 (ql:quickload "local-time")
 (ql:quickload :flexi-streams)
+(ql:quickload :yason)
 
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
-			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str)
+			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
+			:to-json-string)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -120,6 +122,10 @@
 				(format nil "~A:00" hour)
 				(format nil "~A:~A" hour min ) ))))
 		
+(defun to-json-string (obj)
+	(let ((s (make-string-output-stream)))
+		(yason:encode obj s)
+		(get-output-stream-string s)))
 	
 ;(setf val nil)
 
