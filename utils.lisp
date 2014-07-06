@@ -9,7 +9,7 @@
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
-			:to-json-string)
+			:to-json-string :round-hours)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -111,7 +111,10 @@
 		(reverse newlist_absolute)))
 
 (defun round-minutes (ts)
-	(* 3600 (truncate (/ (utils:unix-time) 3600))))
+	(* 3600 (floor (/ ts 3600))))
+
+(defun round-hours (ts)
+	(- (* (* 24 3600) (floor (/ ts (* 24 3600) ))) (* 5 3600)))
 
 (defun unix-time-to-hour-min-str (ts)
 	(let ((localtime (local-time:unix-to-timestamp ts))
