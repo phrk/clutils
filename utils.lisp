@@ -9,7 +9,7 @@
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
-			:to-json-string :round-hours)
+			:to-json-string :round-hours :read-file-to-string)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -129,7 +129,16 @@
 	(let ((s (make-string-output-stream)))
 		(yason:encode obj s)
 		(get-output-stream-string s)))
-	
+
+(defun read-file-to-string (filename)
+	(let ((in (open filename :if-does-not-exist nil))
+			(ret ""))
+			  (when in
+			    (loop for line = (read-line in nil)
+			         while line do (setf ret (format nil "~A~A" ret line)))
+			    (close in))
+			ret))
+
 ;(setf val nil)
 
 ;(setf cond (bordeaux-threads:make-condition-variable))
