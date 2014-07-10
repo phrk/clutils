@@ -74,10 +74,13 @@
 				(return-from check-fields nil)))
 
 		t))
-
+;(hunchentoot:url-decode (cdr a) :utf-8 )
+;(do-urlencode:urldecode
 (defmethod handle-request((api http-api-class) req)
 	(let ((fields (make-hash-table :test #'equal)))
-		(mapcar #'(lambda (a) (setf (gethash (car a) fields) (hunchentoot:url-decode (cdr a) ) )) (tbnl:get-parameters req))
+		(mapcar #'(lambda (a) (setf (gethash (car a) fields) (utils:url-decode (cdr a)))) (tbnl:get-parameters req))
 		(if (not (check-fields api fields))
 			(funcall (get-auth-error api))
-			(funcall (gethash (gethash "method" fields) (methods-callbacks api)) fields))))
+			(progn
+				;(format t "CALLING METHOD ~A~%~%" (gethash "method" fields))
+				(funcall (gethash (gethash "method" fields) (methods-callbacks api)) fields)))))

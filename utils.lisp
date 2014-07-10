@@ -5,11 +5,13 @@
 (ql:quickload "local-time")
 (ql:quickload :flexi-streams)
 (ql:quickload :yason)
+(ql:quickload "hunchentoot")
+(ql:quickload :do-urlencode)
 
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
-			:to-json-string :round-hours :read-file-to-string)
+			:to-json-string :round-hours :read-file-to-string :url-decode)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -138,6 +140,14 @@
 			         while line do (setf ret (format nil "~A~A" ret line)))
 			    (close in))
 			ret))
+
+(defun url-decode (str)
+	;(format t "TYEPOF: ~A~%" (type-of str))
+	;(if (stringp str)
+	;	(hunchentoot:url-decode str)
+		
+		;)
+		(do-urlencode:urldecode str :lenientp t))
 
 ;(setf val nil)
 
