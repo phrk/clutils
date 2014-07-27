@@ -11,7 +11,7 @@
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
-			:to-json-string :round-hours :read-file-to-string :url-decode)
+			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -126,6 +126,13 @@
 			(if (equal min 0)
 				(format nil "~A:00" hour)
 				(format nil "~A:~A" hour min ) ))))
+
+(defun unix-time-to-date (ts)
+	(let ((localtime (local-time:unix-to-timestamp ts))
+		(day 0)
+		(month 0))
+		(local-time:with-decoded-timestamp (:day day :month month) localtime
+				(format nil "~A.~A" day month))))
 		
 (defun to-json-string (obj)
 	(let ((s (make-string-output-stream)))
