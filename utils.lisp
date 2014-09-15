@@ -11,7 +11,7 @@
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
-			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date)
+			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -133,11 +133,32 @@
 		(month 0))
 		(local-time:with-decoded-timestamp (:day day :month month) localtime
 				(format nil "~A.~A" day month))))
+
+(defun replace-all (string part replacement &key (test #'char=))
+	"Returns a new string in which all the occurences of the part 
+	is replaced with replacement."
+	    (with-output-to-string (out)
+	      (loop with part-length = (length part)
+	            for old-pos = 0 then (+ pos part-length)
+	            for pos = (search part string
+	                              :start2 old-pos
+	                              :test test)
+	            do (write-string string out
+	                             :start old-pos
+	                             :end (or pos (length string)))
+	            when pos do (write-string replacement out)
+	            while pos)))
 		
 (defun to-json-string (obj)
 	(let ((s (make-string-output-stream)))
 		(yason:encode obj s)
 		(get-output-stream-string s)))
+
+(defun escape-json-postgres (str)
+	(replace-all str "'" "''"))
+
+(defun unescape-json-postgres ()
+	(replace-all str "''" "'"))
 
 (defun read-file-to-string (filename)
 	(let ((in (open filename :if-does-not-exist nil))
