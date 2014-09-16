@@ -19,9 +19,7 @@
   ;; options
 	(:default-initargs                    ; default-initargs must be used
 ;	:address "127.0.0.1"
-	:persistent-connections-p nil
-	)
-	
+	:persistent-connections-p nil)
 	)               ; because ACCEPTOR uses it
 
 ;;; Specialise ACCEPTOR-DISPATCH-REQUEST for VHOSTs
@@ -48,7 +46,7 @@
 	(vector-push-extend (create-handler-info path fn) (listener-handlers lstnr)))
 
 (defmethod listener-start((lstnr listener) port)
-	(setf (listener-srv lstnr) (make-instance 'vhost :port port :persistent-connections-p nil))
+	(setf (listener-srv lstnr) (make-instance 'vhost :port port :persistent-connections-p nil :output-chunking-p nil))
 	(utils:iterate-array (listener-handlers lstnr)
 		#'(lambda (obj) (push (tbnl:create-prefix-dispatcher (handler-info-path obj) (handler-info-fn obj))
 		      								(dispatch-table (listener-srv lstnr)))))
