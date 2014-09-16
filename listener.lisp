@@ -48,7 +48,7 @@
 	(vector-push-extend (create-handler-info path fn) (listener-handlers lstnr)))
 
 (defmethod listener-start((lstnr listener) port)
-	(setf (listener-srv lstnr) (make-instance 'vhost :port port))
+	(setf (listener-srv lstnr) (make-instance 'vhost :port port :persistent-connections-p nil))
 	(utils:iterate-array (listener-handlers lstnr)
 		#'(lambda (obj) (push (tbnl:create-prefix-dispatcher (handler-info-path obj) (handler-info-fn obj))
 		      								(dispatch-table (listener-srv lstnr)))))
