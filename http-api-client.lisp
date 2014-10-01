@@ -1,4 +1,4 @@
-(load "clutils/utils.lisp")
+(utils:hiconn "clutils/utils.lisp")
 (ql:quickload :drakma)
 (ql:quickload :yason)
 

@@ -1,5 +1,5 @@
 
-(load "clutils/utils.lisp")
+(utils:hiconn "clutils/utils.lisp")
 (ql:quickload "hunchentoot")
 
 (defpackage :utils

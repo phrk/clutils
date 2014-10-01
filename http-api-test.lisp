@@ -2,9 +2,9 @@
 (ql:quickload "linedit")
 (linedit:install-repl)
 
-(load "clutils/http-api.lisp")
-(load "clutils/http-api-client.lisp")
-(load "clutils/listener.lisp")
+(utils:hiconn "clutils/http-api.lisp")
+(utils:hiconn "clutils/http-api-client.lisp")
+(utils:hiconn "clutils/listener.lisp")
 
 (defpackage :utils
 	(:export )
