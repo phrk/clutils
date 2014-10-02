@@ -2,7 +2,7 @@
 (load "clutils/utils.lisp")
 
 (defpackage :utils
-	(:export :hipath :hiconn)
+	(:export :hipath :hiconn :hiprint)
 	(:use :common-lisp)
 )
 
@@ -18,12 +18,18 @@
 	
 		(map nil #'(lambda(path)
 						(let* ((relpath (concatenate 'string path file))
-								(fullpath (directory relpath)))
+								(fullpath (directory relpath)  ))
 								
 									(if (null (gethash fullpath *hiconn-loaded-files*))
 										(if (load relpath :IF-DOES-NOT-EXIST nil :verbose t) 
-											(progn 
+											(progn
 												(setf (gethash fullpath *hiconn-loaded-files*) t)
 												(return-from hiconn))))))
 			*hiconn-paths*)
 	nil)
+
+(defun hiprint ()
+	(maphash  
+		#'(lambda (k v)
+			(format t "~A~%" (car k) ))
+		*hiconn-loaded-files*))
