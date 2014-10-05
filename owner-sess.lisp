@@ -24,7 +24,7 @@
 		(if (null resp)
 			nil
 			(let ((ret (yason:parse (car (car resp)))))
-				;(setf (gethash "partner_ids" ret) (yason:parse (gethash "partner_ids" ret)))
+				(setf (gethash "enabled_opts" ret) (yason:parse (gethash "enabled_opts" ret)))
 			 	ret))))
 
 ; returns userid
