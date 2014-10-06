@@ -8,18 +8,19 @@
 
 (in-package :owner-sess)
 
-(defun create-user (login pass)
+(defun create-user (login pass ownerid enabled_opts)
 	(let ((resp (utils:dbquery (format nil "select * from oshop_site.users WHERE login='~A'" login))))
 		(if (null resp)
 			(progn 
 				(let* ((salt (format nil "~A" (random 100000)))
 						(passhash (utils:sha1-hash (format nil "~A~A" pass salt)))
-							(ownerid (car (car (utils:dbquery (format nil "INSERT INTO oshop_site.users (login, passhash, salt) VALUES ('~A','~A','~A') RETURNING id"
-							 login passhash salt)))))))
+							(userid (car (car (utils:dbquery (format nil "INSERT INTO oshop_site.users (login, passhash, salt, ownerid, enabled_opts) VALUES ('~A','~A','~A', ~A, '~A') RETURNING id"
+							 login passhash salt ownerid (utils:to-json-string enabled_opts) )))))))
 				t)
 			nil)))
 
 (defun get-user (userid)
+	(format t "get-user ~A~%" userid)
 	(let ((resp (utils:dbquery (format nil "select row_to_json (row) from oshop_site.users row WHERE id=~A" userid))))
 		(if (null resp)
 			nil
@@ -65,7 +66,7 @@
 	(list userid token))
 
 (defun check-session (userid token)
-	(setf resp (utils:dbquery (format nil "select row_to_json (row) from oshop_site.sessions row WHERE userid='~A'" userid)))
+	(setf resp (utils:dbquery (format nil "select row_to_json (row) from oshop_site.sessions row WHERE userid='~A' AND token='~A'" userid token)))
 	(if (null resp)
 		nil
 		(progn
