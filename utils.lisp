@@ -11,7 +11,8 @@
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
-			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres)
+			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
+			:url-encode)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -168,6 +169,9 @@
 			         while line do (setf ret (format nil "~A~A" ret line)))
 			    (close in))
 			ret))
+
+(defun url-encode (str)
+	(do-urlencode:urlencode str))
 
 (defun url-decode (str)
 	;(format t "TYEPOF: ~A~%" (type-of str))
