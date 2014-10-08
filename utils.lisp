@@ -7,6 +7,8 @@
 (ql:quickload :yason)
 (ql:quickload "hunchentoot")
 (ql:quickload :do-urlencode)
+(ql:quickload :trivial-utf-8)
+(ql:quickload :cl-base64)
 
 (defpackage :utils
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
