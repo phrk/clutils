@@ -3,7 +3,7 @@
 (ql:quickload :postmodern)
 
 (defpackage :owner-sess
-  (:export :create-user :get-user :check-login :gen-session-data :check-session)
+  (:export :create-user :get-user :get-users :check-login :gen-session-data :check-session)
   (:use :common-lisp))
 
 (in-package :owner-sess)
@@ -27,6 +27,21 @@
 			(let ((ret (yason:parse (car (car resp)))))
 				(setf (gethash "enabled_opts" ret) (yason:parse (gethash "enabled_opts" ret)))
 			 	ret))))
+
+(defun get-users (sch)
+	(let ((resp (utils:dbquery (format nil "select row_to_json (row) from ~A.users row" sch )))
+			(users (utils:make-smart-vec)))
+	
+		(if (null resp)
+			nil
+			(progn
+				(map nil #'(lambda (u)
+							(let ((usr (yason:parse (car u))))
+								(setf (gethash "enabled_opts" usr) (yason:parse (gethash "enabled_opts" usr)))
+								(vector-push-extend usr users)))
+						resp)
+				users))))
+			 	
 
 ; returns userid
 (defun check-login (sch login pass)
