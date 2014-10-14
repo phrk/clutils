@@ -1,11 +1,10 @@
 (ql:quickload "bordeaux-threads")
 (ql:quickload :ironclad)
 (ql:quickload :postmodern)
-(load "clutils/queue.lisp")
 (ql:quickload "local-time")
 (ql:quickload :flexi-streams)
 (ql:quickload :yason)
-(ql:quickload "hunchentoot")
+;(ql:quickload "hunchentoot")
 (ql:quickload :do-urlencode)
 (ql:quickload :trivial-utf-8)
 (ql:quickload :cl-base64)
@@ -18,6 +17,8 @@
 	(:use :common-lisp))
 
 (in-package :utils)
+
+(load "clutils/queue.lisp")
 
 (defparameter *dblock* (bordeaux-threads:make-lock "db-lock"))
 
