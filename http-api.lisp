@@ -93,8 +93,13 @@
 ;(hunchentoot:url-decode (cdr a) :utf-8 )
 ;(do-urlencode:urldecode
 (defmethod handle-request((api http-api-class) get-param)
-	(let ((fields (check-fields api get-param)))
+	(let ((fields_raw (check-fields api get-param))
+			(fields (make-hash-table :test #'equal)))
 		;(mapcar #'(lambda (a) (setf (gethash (car a) fields) (utils:url-decode (cdr a)))) (tbnl:get-parameters req))
+		(maphash #'(lambda (k v)
+							(setf (gethash k fields) (utils:url-decode v)))
+				fields_raw)
+		
 		(if (null fields)
 			(funcall (get-auth-error api))
 			(progn
