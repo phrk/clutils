@@ -13,7 +13,7 @@
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
 			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
-			:url-encode)
+			:url-encode :split :merge-unique-vecs :merge-unique-lists)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -80,6 +80,15 @@
     (mklist (x) (if (listp x) x (list x)))
     )
     (mapcan #'(lambda (x) (if (atom x) (mklist x) (flatten x))) ls)))
+
+(defun split (s str)
+	(let ((pos (position s str :test #'equal)))
+		(if (null pos)
+			(list str)
+			(progn 
+				(let ((left_str (subseq str 0 pos))
+						(right_str (subseq str (+ pos 1))))
+							(cons left_str (split s right_str)))))))
 
 (defun sha1-hash (data)
   (let ((sha1 (ironclad:make-digest 'ironclad:sha1))
@@ -183,6 +192,41 @@
 		
 		;)
 		(do-urlencode:urldecode str :lenientp t))
+
+(defun merge-unique-vecs (v1 v2)
+	(let ((res_hash (make-hash-table :test #'equal))
+			(res (make-smart-vec)))
+
+		(map nil #'(lambda (f)
+						(setf (gethash f res_hash) t))
+				v1)
+		
+		(map nil #'(lambda (f)
+						(setf (gethash f res_hash) t))
+				v2)
+		
+		(maphash #'(lambda (k v)
+						(vector-push-extend k res)
+				res_hash)
+		res)))
+
+(defun merge-unique-lists (l1 l2)
+	(let ((res_hash (make-hash-table :test #'equal))
+			(res '()))
+
+		(map nil #'(lambda (f)
+						(setf (gethash f res_hash) t))
+				l1)
+
+		(map nil #'(lambda (f)
+						(setf (gethash f res_hash) t))
+				l2)
+
+		(maphash #'(lambda (k v)
+						(setf res (cons k res)))
+				res_hash)
+		res))
+
 
 ;(setf val nil)
 
