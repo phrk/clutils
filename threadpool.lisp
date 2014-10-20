@@ -1,6 +1,6 @@
-(ql:quickload "bordeaux-threads")
+(ql:quickload :bordeaux-threads)
 
-(load "clutils/utils.lisp")
+(utils:hiconn "clutils/utils.lisp")
 
 (defpackage :utils
 	(:export :threadpool :threadpool-start :threadpool-stop :add-task :pool-test :threadpool-add-threads)

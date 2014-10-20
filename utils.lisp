@@ -13,7 +13,7 @@
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
 			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
-			:url-encode :split :merge-unique-vecs :merge-unique-lists)
+			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags)
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -227,6 +227,15 @@
 				res_hash)
 		res))
 
+
+(defun erase-tags (str)
+	(if (null str)
+		(return-from erase-tags nil))
+
+	(setf str (utils:replace-all str "'" ""))
+	(setf str (utils:replace-all str "<" ""))
+	(setf str (utils:replace-all str ">" ""))
+	str)
 
 ;(setf val nil)
 
