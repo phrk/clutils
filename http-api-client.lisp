@@ -43,7 +43,7 @@
 (defmethod call-signed ((api http-api-client-class) method params)
 	(let ((url (build-url-signed api method params)))
 		;(format t "BUILDURL: ~A ~%" url)
-		(drakma:http-request url :close t :connection-timeout 1 )))
+		(drakma:http-request url :close t :connection-timeout 1 :force-binary t )))
 
 (defun test-build-url ()
 	(setf api (make-instance 'http-api-client-class :url "http://localhost/api/" :api-userid "_user_" :api-key "_key_" :is-auth-info-set t))
