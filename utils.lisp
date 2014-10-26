@@ -13,7 +13,7 @@
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
 			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
-			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags)
+			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags :decode-octets-if-need) 
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -101,6 +101,13 @@
 
 (defun bytes-to-string (arr)
 	(flexi-streams:octets-to-string arr :external-format :utf-8))
+
+(defun decode-octets-if-need (str)
+
+	(if (every #'(lambda (e)
+					(typep e '(UNSIGNED-BYTE 8)))
+			str)
+		(bytes-to-string str)))
 
 (defun remove-symbols (str)
 	(string-trim " " (remove-if-not #'(lambda (s) (or (alphanumericp s)  (equal #\Space s) (equal #\. s)  )) str)))
