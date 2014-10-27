@@ -13,7 +13,8 @@
 	(:export :make-smart-vec :iterate-array :iterate-list :escape-string :with-lock :with-cond-wait :with-kick :notnil :field-setp :field-not-setp
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
 			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
-			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags :decode-octets-if-need) 
+			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags :decode-octets-if-need :string-to-bytes
+			:string-to-array :encode-octets-if-need) 
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -102,6 +103,19 @@
 (defun bytes-to-string (arr)
 	(flexi-streams:octets-to-string arr :external-format :utf-8))
 
+(defun string-to-bytes (str)
+	(flexi-streams:string-to-octets str :external-format :utf-8))
+
+(defun string-to-array (str)
+	(let* ((arr (make-array (length str) :element-type '(UNSIGNED-BYTE 8) :fill-pointer nil :adjustable nil ))
+		(i 0))
+			(map nil
+			    #'(lambda (e)
+					(setf (aref arr i) (aref str i))
+					(setf i (+ 1 i)))
+			str)
+		arr))
+
 (defun decode-octets-if-need (str)
 
 	(if (every #'(lambda (e)
@@ -109,6 +123,13 @@
 			str)
 		(bytes-to-string str)
 		str))
+
+(defun encode-octets-if-need (str)
+	(if (every #'(lambda (e)
+					(typep e '(UNSIGNED-BYTE 8)))
+			str)
+		str
+		(string-to-bytes str)))
 
 (defun remove-symbols (str)
 	(string-trim " " (remove-if-not #'(lambda (s) (or (alphanumericp s)  (equal #\Space s) (equal #\. s)  )) str)))
