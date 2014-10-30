@@ -14,7 +14,7 @@
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
 			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
 			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags :decode-octets-if-need :string-to-bytes
-			:string-to-array :encode-octets-if-need) 
+			:string-to-array :encode-octets-if-need :str-appendf) 
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -265,6 +265,9 @@
 	(setf str (utils:replace-all str "<" ""))
 	(setf str (utils:replace-all str ">" ""))
 	str)
+
+(defmacro str-appendf (a b)
+	`(setf ,a (concatenate 'string ,a ,b)))
 
 ;(setf val nil)
 
