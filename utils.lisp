@@ -14,7 +14,7 @@
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
 			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
 			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags :decode-octets-if-need :string-to-bytes
-			:string-to-array :encode-octets-if-need :str-appendf) 
+			:string-to-array :encode-octets-if-need :str-appendf :aif :anif :nif :merge-hash-tables :inttostr) 
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -268,6 +268,28 @@
 
 (defmacro str-appendf (a b)
 	`(setf ,a (concatenate 'string ,a ,b)))
+
+(defmacro aif (test then &optional else)
+	`(let ((it ,test))
+		(if it ,then ,else)))
+
+(defmacro anif (test then &optional else)
+	`(let ((it ,test))
+		(if (not it) ,then ,else)))
+
+(defmacro nif (v then &optional else)
+	`(if (null ,v)
+		,then
+		,else))
+
+(defun merge-hash-tables (h1 h2)
+	(maphash #'(lambda (k v)
+					(setf (gethash k h1) v))
+		h2)
+	h1)
+
+(defun inttostr(i)
+	(format nil "~A" i))
 
 ;(setf val nil)
 
