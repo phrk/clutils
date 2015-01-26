@@ -14,7 +14,7 @@
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
 			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
 			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags :decode-octets-if-need :string-to-bytes
-			:string-to-array :encode-octets-if-need :str-appendf :aif :anif :nif :merge-hash-tables :inttostr) 
+			:string-to-array :encode-octets-if-need :str-appendf :aif :anif :nif :merge-hash-tables :inttostr :init-hash-eval :concat :merge-smart-vecs) 
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -266,8 +266,12 @@
 	(setf str (utils:replace-all str ">" ""))
 	str)
 
-(defmacro str-appendf (a b)
-	`(setf ,a (concatenate 'string ,a ,b)))
+(defmacro str-appendf (a &rest lst)
+	(let ((s (gensym)))
+	`(map nil
+		#'(lambda (,s)
+			(setf ,a (concatenate 'string ,a (eval ,s))))
+		',lst)))
 
 (defmacro aif (test then &optional else)
 	`(let ((it ,test))
@@ -290,6 +294,32 @@
 
 (defun inttostr(i)
 	(format nil "~A" i))
+
+(defmacro init-hash-eval (&rest lst)
+	(let ((hashname (gensym))
+			(kv (gensym)))
+	`(let ((,hashname (make-hash-table :test #'equal)))
+		(map nil #'(lambda (,kv)
+						(setf (gethash (car ,kv) ,hashname) (eval (second ,kv))))
+			',lst)
+		,hashname)))
+
+(defmacro concat (&rest lst)
+	(let ((ret (gensym))
+			(s (gensym)))
+	`(let ((,ret ""))
+		(map nil
+			#'(lambda (,s)
+				(setf ,ret (format nil "~A~A" ,ret (eval ,s))))
+			',lst)
+		,ret)))
+
+(defun merge-smart-vecs (a b)
+	(map nil
+		#'(lambda (e)
+			(vector-push-extend e a))
+		b)
+	a)
 
 ;(setf val nil)
 

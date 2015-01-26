@@ -1,4 +1,4 @@
-(utils:hiconn "clutils/utils.lisp")
+(utils:hiconn "utils.lisp")
 
 (ql:quickload :do-urlencode)
 (ql:quickload :hunchentoot)
