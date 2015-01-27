@@ -7,7 +7,7 @@
 	(:export :read-ct-file :print-types :verify-ct-object :ct-obj :ct-obj-fields :ct-obj-types :create-ct-obj :ct-field :ct-type
 			:ct-type-id :ct-type-nameru :ct-type-children :gen-json-types-repr :ct-obj-dump :ct-obj-field :ct-obj-id :get-type-name
 			:get-fields-for-types :ct-field :ct-field-name :ct-field-caption :ct-field-required :ct-field-expl-value :ct-field-possible-values
-			)
+			:ct-obj-set-field)
 	(:use :common-lisp)
 )
 
@@ -36,6 +36,9 @@
 
 (defun ct-field-ispublic (field)
 	(null (ct-field-private field)))
+
+(defun ct-obj-set-field (f v obj)
+	(setf (gethash f (ct-obj-fields obj)) v))
 
 (defun ct-obj-field (field obj)
 	(if (null obj)
@@ -182,22 +185,41 @@
 		
 			(maphash
 				#'(lambda (k field)
-					(if (or (null public)
-							(ct-field-ispublic field))
-						(vector-push-extend field ret)))
+					;if field
+						(if (or (null public)
+								(ct-field-ispublic field))
+							(vector-push-extend field ret)))
+							;
 				hash)
 		ret))
 
 (defun create-ct-obj (types &key typesof fields id)
+
+	;(format t "create-ct-obj start~%")
+
 	(let ((obj (make-ct-obj :fields fields))
-			(obj-types-hash (make-hash-table :test #'equal)))
+			(obj-types-hash (make-hash-table :test #'equal))
+			(fields-descrs (get-fields-for-types types typesof))
+			(expl-types-hash (make-hash-table :test #'equal)))
+
+		;(pprint obj)
 
 		; push expl values to types
-		;(map nil #'(lambda (field)
-		;				(if (ct-field-expl-value field)
-		;					(aif (ct-obj-field (ct-field-name field) obj)
-		;						(setf typesof (cons it typesof)))))
-		;	(get-fields-for-types types typesof))
+		(map nil #'(lambda (field)
+						(if (ct-field-expl-value field)
+						(progn 
+							(if (ct-obj-field (ct-field-name field) obj)
+								; set
+								(setf (gethash (ct-obj-field (ct-field-name field) obj) expl-types-hash) t)
+								; not set
+								;(if (ct-field-required field)
+								;	)
+								))))
+			fields-descrs)
+		
+		;(format t "pushed expl values~%")
+		
+		(setf obj-types-hash (merge-hash-tables obj-types-hash expl-types-hash))
 		
 		(map nil #'(lambda (tp)
 					(setf obj-types-hash (merge-hash-tables obj-types-hash (get-hierarchy-hash tp types))))
@@ -205,16 +227,26 @@
 		
 		; set types list
 		(maphash #'(lambda (k v)
+						;(format t "type: ~A~%" k )
 						(setf (ct-obj-types obj) (cons k (ct-obj-types obj))))
 			obj-types-hash)
+		
+		;(maphash #'(lambda (k v)
+		;				(format t "field: ~A/~A~%" k v))
+		;	fields)
 		
 		;(if id
 		(setf (ct-obj-id obj) id)
 		;(format t "create-ct-obj id : ~A~%~%~%" id)
 		
+		;(format t "create-ct-obj finished~%")
+		
 		obj))
 
 (defun verify-ct-object (obj types)
+
+	;(format t "verify-ct-object start~%")
+
 	(map nil #'(lambda (tp)
 					(aif (gethash tp types)
 						(maphash #'(lambda (k field)
@@ -227,6 +259,7 @@
 							(ct-type-fields it))
 						(return-from verify-ct-object (format nil "No Such type: ~A" tp))))
 		(ct-obj-types obj))
+	;(format t "verify-ct-object finished~%")
 	nil)
 
 (defun ct-obj-dump (obj)
