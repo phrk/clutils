@@ -7,7 +7,7 @@
 	(:export :read-ct-file :print-types :verify-ct-object :ct-obj :ct-obj-fields :ct-obj-types :create-ct-obj :ct-field :ct-type
 			:ct-type-id :ct-type-nameru :ct-type-children :gen-json-types-repr :ct-obj-dump :ct-obj-field :ct-obj-id :get-type-name
 			:get-fields-for-types :ct-field :ct-field-name :ct-field-caption :ct-field-required :ct-field-expl-value :ct-field-possible-values
-			:ct-obj-set-field)
+			:ct-obj-set-field :merge-objects)
 	(:use :common-lisp)
 )
 
@@ -33,6 +33,34 @@
 	nameen
 	fields		; hash
 	children)	; list
+
+(defun merge-objects (orig new)
+	
+	(let ((obj-types-hash (make-hash-table :test #'equal))
+			(typeslist (utils:make-smart-vec)))
+		
+		(map nil
+			#'(lambda (tp)
+				(setf (gethash tp obj-types-hash) t))
+			(ct-obj-types orig))
+	
+		(map nil
+			#'(lambda (tp)
+				(setf (gethash tp obj-types-hash) t))
+			(ct-obj-types new))
+		
+		(maphash 
+			#'(lambda (k v)
+				(vector-push-extend k typeslist))
+			obj-types-hash)
+		
+		(setf (ct-obj-types orig) typeslist)
+		
+		(maphash
+			#'(lambda (k v)
+				(setf (gethash k (ct-obj-fields orig)) v))
+			(ct-obj-fields new))
+	orig))
 
 (defun ct-field-ispublic (field)
 	(null (ct-field-private field)))
@@ -264,6 +292,10 @@
 
 (defun ct-obj-dump (obj)
 	(anaphora:alet (make-hash-table :test #'equal)
+		
+		(if (ct-obj-id obj)
+			(setf (gethash "id" anaphora:it) (ct-obj-id obj)))
+		
 		(setf (gethash "types" anaphora:it) (ct-obj-types obj))
 		(setf (gethash "fields" anaphora:it) (ct-obj-fields obj))
 		(utils:to-json-string anaphora:it)))

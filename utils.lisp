@@ -14,7 +14,7 @@
 			:flatten :sha1-hash :unix-time :bytes-to-string :remove-symbols :dbquery :list-conc-prefixes :round-minutes :unix-time-to-hour-min-str
 			:to-json-string :round-hours :read-file-to-string :url-decode :unix-time-to-date :escape-json-postgres :unescape-json-postgres
 			:url-encode :split :merge-unique-vecs :merge-unique-lists :replace-all :erase-tags :decode-octets-if-need :string-to-bytes
-			:string-to-array :encode-octets-if-need :str-appendf :aif :anif :nif :merge-hash-tables :inttostr :init-hash-eval :concat :merge-smart-vecs) 
+			:string-to-array :encode-octets-if-need :str-appendf :aif :anif :nif :merge-hash-tables :inttostr :init-hash-eval :concat :merge-smart-vecs :get-file-ext) 
 	(:use :common-lisp))
 
 (in-package :utils)
@@ -320,6 +320,12 @@
 			(vector-push-extend e a))
 		b)
 	a)
+
+(defun get-file-ext (filename)
+(let ((dotpos (position #\. filename :test #'equal :from-end t)))
+	(if (null dotpos)
+		"file"
+		(subseq filename (+ 1 dotpos) (length filename)))))
 
 ;(setf val nil)
 
