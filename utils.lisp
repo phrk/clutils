@@ -203,7 +203,7 @@
 	(replace-all str "''" "'"))
 
 (defun read-file-to-string (filename)
-	(let ((in (open filename :if-does-not-exist nil))
+	(let ((in (open filename :if-does-not-exist nil :external-format :utf-8))
 			(ret ""))
 			  (when in
 			    (loop for line = (read-line in nil)
