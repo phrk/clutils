@@ -244,7 +244,6 @@
   (replace-all str "''" "'"))
 
 (defun read-file-to-string (filename)
-<<<<<<< HEAD
   (let ((in (open filename :if-does-not-exist nil))
 	(ret ""))
     (when in
@@ -252,15 +251,6 @@
 	    while line do (setf ret (format nil "~A~A" ret line)))
       (close in))
     ret))
-=======
-	(let ((in (open filename :if-does-not-exist nil :external-format :utf-8))
-			(ret ""))
-			  (when in
-			    (loop for line = (read-line in nil)
-			         while line do (setf ret (format nil "~A~A" ret line)))
-			    (close in))
-			ret))
->>>>>>> f6a3938e7cd91cf3011ad6f8e9ea0180961f6d58
 
 (defun url-encode (str)
   (do-urlencode:urlencode str))
