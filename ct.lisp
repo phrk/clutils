@@ -157,7 +157,7 @@
 		types))
 
 (defun read-ct-file (filename)
-	(let ((in (open filename :if-does-not-exist nil))
+	(let ((in (open filename :if-does-not-exist nil :external-format :utf-8))
 			(types (make-hash-table :test #'equal)))
 				(when in
 					(loop for line = (read-line in nil)
