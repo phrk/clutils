@@ -21,7 +21,7 @@
 								(fullpath (directory relpath)  ))
 								
 									(if (null (gethash fullpath *hiconn-loaded-files*))
-										(if (load relpath :IF-DOES-NOT-EXIST nil :verbose t) 
+										(if (load relpath :if-does-not-exist nil :verbose t) 
 											(progn
 												(setf (gethash fullpath *hiconn-loaded-files*) t)
 												(return-from hiconn))))))
