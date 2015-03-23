@@ -3,7 +3,7 @@
 (ql:quickload :postmodern)
 
 (defpackage :owner-sess
-  (:export :create-user :get-user :get-users :check-login :gen-session-data :check-session)
+  (:export :create-user :get-user :get-users :check-login :gen-session-data :check-session :get-user-by-login)
   (:use :common-lisp))
 
 (in-package :owner-sess)
@@ -29,6 +29,15 @@
 (defun get-user (sch userid)
   "returns user by id"
   (let ((resp (utils:dbquery (format nil "select row_to_json (row) from ~A.users row WHERE id=~A" sch userid))))
+    (if (null resp)
+	nil
+      (let ((ret (yason:parse (car (car resp)))))
+	(setf (gethash "enabled_opts" ret) (yason:parse (gethash "enabled_opts" ret)))
+	ret))))
+
+(defun get-user-by-login (sch login)
+  "returns user by login"
+  (let ((resp (utils:dbquery (format nil "select row_to_json (row) from ~A.users row WHERE login='~A'" sch login))))
     (if (null resp)
 	nil
       (let ((ret (yason:parse (car (car resp)))))
