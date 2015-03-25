@@ -32,8 +32,10 @@
     (if (null resp)
 	nil
       (let ((ret (yason:parse (car (car resp)))))
-	(setf (gethash "enabled_opts" ret) (yason:parse (gethash "enabled_opts" ret)))
-	ret))))
+	   (if (null ret)
+	  	(return-from get-user nil))
+	   (setf (gethash "enabled_opts" ret) (yason:parse (gethash "enabled_opts" ret)))
+	   ret))))
 
 (defun get-user-by-login (sch login)
   "returns user by login"
