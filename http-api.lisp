@@ -96,6 +96,10 @@
 	(let ((fields_raw (check-fields api get-param))
 			(fields (make-hash-table :test #'equal)))
 		;(mapcar #'(lambda (a) (setf (gethash (car a) fields) (utils:url-decode (cdr a)))) (tbnl:get-parameters req))
+		
+		(if (null fields_raw)
+			(return-from handle-request "not all params set"))
+		
 		(maphash #'(lambda (k v)
 							(setf (gethash k fields) (utils:url-decode v)))
 				fields_raw)
