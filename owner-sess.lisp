@@ -3,7 +3,7 @@
 (ql:quickload :postmodern)
 
 (defpackage :owner-sess
-  (:export :create-user :get-user :get-users :check-login :gen-session-data :check-session :get-user-by-login)
+  (:export :create-user :get-user :save-user :get-users :check-login :gen-session-data :check-session :get-user-by-login)
   (:use :common-lisp))
 
 (in-package :owner-sess)
@@ -37,6 +37,13 @@
 	   (setf (gethash "enabled_opts" ret) (yason:parse (gethash "enabled_opts" ret)))
 	   ret))))
 
+(defun save-user (sch user)
+	(utils:dbquery (format nil
+							  "UPDATE ~A.users SET enabled_opts = '~A' WHERE id = ~A"
+							  sch
+							  (utils:escape-json-postgres (utils:to-json-string (gethash "enabled_opts" user)))
+							  (gethash "id" user))))
+
 (defun get-user-by-login (sch login)
   "returns user by login"
   (let ((resp (utils:dbquery (format nil "select row_to_json (row) from ~A.users row WHERE login='~A'" sch login))))
@@ -58,6 +65,13 @@
 			     (yason:parse (gethash "enabled_opts" usr)))
 		       (vector-push-extend usr users)))
 	     resp)
+	
+	 (sort users 
+	  #'(lambda (a b)
+	   (string-lessp 
+	    (gethash "login" a)
+	    (gethash "login" b))))
+	
 	users))))
 			 	
 (defun check-login (sch login pass)
