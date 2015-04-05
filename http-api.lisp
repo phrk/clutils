@@ -42,7 +42,7 @@
 	(add-api-method api name args_names onreq)
 	(setf (gethash name (methods-signed api)) t))
 
-(defmethod check-fields ((api http-api-class) get-param)
+(defmethod check-fields ((api http-api-class) get-param post-param)
 	;(format t "check-fields ~%~%")
 	(let ((fields (make-hash-table :test #'equal))
 			(method (funcall get-param "method"))
@@ -50,12 +50,34 @@
 		(ts (funcall get-param "ts"))
 		(sign (funcall get-param "sign")))
 		
+		; merge post params
+		(handler-case
+			(progn
+				(let* ((post_raw (funcall post-param "params"))
+						(postfields (yason:parse (utils:decode-octets-if-need (cl-base64:BASE64-STRING-TO-USB8-ARRAY  post_raw))))
+						)
+					(maphash
+						#'(lambda (k v)
+							(setf (gethash k fields) v)
+							;(format t "POSTFIELD: ~A:~A~%" k v)
+							)
+						postfields)
+						))
+		(error (cnd) nil))
+		
+		
 		(setf (gethash "method" fields) method)
 		(setf (gethash "ts" fields) ts)
 		(setf (gethash "api_userid" fields) api_userid)
 		(setf (gethash "sign" fields) sign)
 		
-		;(format t "METHOD: ~A~%" method)
+		
+		(format t "~%~%METHOD: ~A~%" method)
+		(format t "signed: ~A~%" (signedp api method))
+		(maphash
+			#'(lambda (k v)
+				(format t "FIELD: ~A/~A ~%" k v))
+			fields)
 		
 		(if (null method)
 			(return-from check-fields nil))
@@ -63,11 +85,20 @@
 		(if (null (gethash method (methods-args api)))
 			(return-from check-fields nil))
 		
+		; merge get params 
 		(utils:iterate-array (gethash method (methods-args api)) 
-							#'(lambda (arg) 
-											(let ((field (funcall get-param arg)))
+							#'(lambda (arg)
+								(let ((field (funcall get-param arg)))
+									(if field
+										(setf  (gethash arg fields) field)))))
+		
+		(utils:iterate-array (gethash method (methods-args api)) 
+							#'(lambda (arg)
+											(let ((field (gethash arg fields)))
 												(if (null field)
-													(return-from check-fields nil)
+													(progn
+														(format t "field not set: ~A ~%" arg)
+														(return-from check-fields nil))
 													(progn
 														(setf (gethash arg fields)   field )
 														;(format t "FIELD: ~A/~A~%" arg (gethash arg fields))
@@ -92,8 +123,8 @@
 		fields))
 ;(hunchentoot:url-decode (cdr a) :utf-8 )
 ;(do-urlencode:urldecode
-(defmethod handle-request((api http-api-class) get-param)
-	(let ((fields_raw (check-fields api get-param))
+(defmethod handle-request((api http-api-class) get-param post-param)
+	(let ((fields_raw (check-fields api get-param post-param))
 			(fields (make-hash-table :test #'equal)))
 		;(mapcar #'(lambda (a) (setf (gethash (car a) fields) (utils:url-decode (cdr a)))) (tbnl:get-parameters req))
 		
