@@ -207,14 +207,17 @@
     (local-time:with-decoded-timestamp (:minute min :hour hour) localtime
 				       (if (equal min 0)
 					   (format nil "~A:00" hour)
-					 (format nil "~A:~A" hour min ) ))))
+					   (if (< min 10)
+					    (format nil "~A:0~A" hour min )
+						(format nil "~A:~A" hour min ))))))
 
 (defun unix-time-to-date (ts)
   (let ((localtime (local-time:unix-to-timestamp ts))
 	(day 0)
-	(month 0))
-    (local-time:with-decoded-timestamp (:day day :month month) localtime
-				       (format nil "~A.~A" day month))))
+	(month 0)
+	(year 0))
+    (local-time:with-decoded-timestamp (:day day :month month :year year) localtime
+				       (format nil "~A.~A.~A" day month year))))
 
 (defun replace-all (string part replacement &key (test #'char=))
   "Returns a new string in which all the occurences of the part 
@@ -341,7 +344,11 @@
 	(kv (gensym)))
     `(let ((,hashname (make-hash-table :test #'equal)))
        (map nil #'(lambda (,kv)
-		    (setf (gethash (car ,kv) ,hashname) (eval (second ,kv))))
+	   				;(if (and (typep (second ,kv) 'list)
+					;		(functionp (car (second ,#'kv)) ))
+		    			(setf (gethash (car ,kv) ,hashname) (eval (second ,kv)))
+					;	(setf (gethash (car ,kv) ,hashname) (second ,kv)))
+						)
 	    ',lst)
 		,hashname)))
 

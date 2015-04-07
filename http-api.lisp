@@ -72,12 +72,12 @@
 		(setf (gethash "sign" fields) sign)
 		
 		
-		(format t "~%~%METHOD: ~A~%" method)
-		(format t "signed: ~A~%" (signedp api method))
-		(maphash
-			#'(lambda (k v)
-				(format t "FIELD: ~A/~A ~%" k v))
-			fields)
+		;(format t "~%~%METHOD: ~A~%" method)
+		;(format t "signed: ~A~%" (signedp api method))
+		;(maphash
+		;	#'(lambda (k v)
+		;		(format t "FIELD: ~A/~A ~%" k v))
+		;	fields)
 		
 		(if (null method)
 			(return-from check-fields nil))
@@ -97,7 +97,7 @@
 											(let ((field (gethash arg fields)))
 												(if (null field)
 													(progn
-														(format t "field not set: ~A ~%" arg)
+														;(format t "field not set: ~A ~%" arg)
 														(return-from check-fields nil))
 													(progn
 														(setf (gethash arg fields)   field )
