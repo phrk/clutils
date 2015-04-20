@@ -9,6 +9,8 @@
 (ql:quickload :trivial-utf-8)
 (ql:quickload :cl-base64)
 
+(ql:quickload :PARSE-NUMBER)
+
 (defpackage :utils
   (:export
    :make-smart-vec
@@ -374,6 +376,8 @@
     (if (null dotpos)
 	"file"
       (subseq filename (+ 1 dotpos) (length filename)))))
+
+
 
  ;(setf val nil)
 
