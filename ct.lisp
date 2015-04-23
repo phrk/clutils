@@ -7,7 +7,7 @@
 	(:export :read-ct-file :print-types :verify-ct-object :ct-obj :ct-obj-fields :ct-obj-types :create-ct-obj :ct-field :ct-type
 			:ct-type-id :ct-type-nameru :ct-type-children :gen-json-types-repr :ct-obj-dump :ct-obj-field :ct-obj-id :get-type-name
 			:get-fields-for-types :ct-field :ct-field-name :ct-field-caption :ct-field-required :ct-field-expl-value :ct-field-possible-values
-			:ct-obj-set-field :merge-objects)
+			:ct-obj-set-field :merge-objects :ct-obj-in-type)
 	(:use :common-lisp)
 )
 
@@ -61,6 +61,9 @@
 				(setf (gethash k (ct-obj-fields orig)) v))
 			(ct-obj-fields new))
 	orig))
+
+(defun ct-obj-in-type (obj type)
+	(member type (ct-obj-types obj)))
 
 (defun ct-field-ispublic (field)
 	(null (ct-field-private field)))
