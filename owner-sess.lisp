@@ -12,7 +12,6 @@
   "returns t or nil if login already exists"
   (let ((resp (utils:dbquery (format nil "select * from ~A.users WHERE login='~A'" sch login))))
     (if (null resp)
-	(progn 
 	  (let* ((salt (format nil "~A" (random 100000 (make-random-state t))))
 		 (passhash (utils:sha1-hash (format nil "~A~A" pass salt)))
 		 (userid (car (car (utils:dbquery (format nil
@@ -22,8 +21,8 @@
 							  passhash
 							  salt
 							  ownerid
-							  (utils:to-json-string enabled_opts))))))))
-	  t)
+							  (utils:to-json-string enabled_opts)))))))
+		userid)
       nil)))
 
 (defun get-user (sch userid)

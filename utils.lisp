@@ -55,10 +55,13 @@
    :nif
    :merge-hash-tables
    :inttostr
+   :tostr
    :init-hash-eval
    :concat
    :merge-smart-vecs
-   :get-file-ext) 
+   :get-file-ext
+   :is-number-in-string
+   :is-int-in-string) 
   (:use :common-lisp))
 
 (in-package :utils)
@@ -339,18 +342,17 @@
   h1)
 
 (defun inttostr(i)
-  (format nil "~A" i))
+ (format nil "~A" i))
+
+(defun tostr (i)
+ (format nil "~A" i))
 
 (defmacro init-hash-eval (&rest lst)
   (let ((hashname (gensym))
 	(kv (gensym)))
     `(let ((,hashname (make-hash-table :test #'equal)))
        (map nil #'(lambda (,kv)
-	   				;(if (and (typep (second ,kv) 'list)
-					;		(functionp (car (second ,#'kv)) ))
-		    			(setf (gethash (car ,kv) ,hashname) (eval (second ,kv)))
-					;	(setf (gethash (car ,kv) ,hashname) (second ,kv)))
-						)
+		    			(setf (gethash (car ,kv) ,hashname) (eval (second ,kv))))
 	    ',lst)
 		,hashname)))
 
@@ -377,7 +379,21 @@
 	"file"
       (subseq filename (+ 1 dotpos) (length filename)))))
 
+(defun is-number-in-string (str)
+ (handler-case
+	(progn
+		(parse-number:parse-number str)
+		(return-from is-number-in-string t))
+ (error (cnd)
+	(return-from is-number-in-string nil))))
 
+(defun is-int-in-string (str)
+ (handler-case
+	(progn
+		(parse-integer str)
+		(return-from is-int-in-string t))
+ (error (cnd)
+	(return-from is-int-in-string nil))))
 
  ;(setf val nil)
 
