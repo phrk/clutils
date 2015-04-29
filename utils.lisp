@@ -395,6 +395,15 @@
  (error (cnd)
 	(return-from is-int-in-string nil))))
 
+(defun copy-hash (table)
+  (let ((new-table (make-hash-table
+                    :test (hash-table-test table)
+                    :size (hash-table-size table))))
+    (maphash #'(lambda(key value)
+                 (setf (gethash key new-table) value))
+             table)
+    new-table))
+
  ;(setf val nil)
 
 ;(setf cond (bordeaux-threads:make-condition-variable))

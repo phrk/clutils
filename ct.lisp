@@ -7,7 +7,7 @@
 	(:export :read-ct-file :print-types :verify-ct-object :ct-obj :ct-obj-fields :ct-obj-types :create-ct-obj :ct-field :ct-type
 			:ct-type-id :ct-type-nameru :ct-type-children :gen-json-types-repr :ct-obj-dump :ct-obj-field :ct-obj-id :get-type-name
 			:get-fields-for-types :ct-field :ct-field-name :ct-field-caption :ct-field-required :ct-field-expl-value :ct-field-possible-values
-			:ct-obj-set-field :merge-objects :ct-obj-in-type)
+			:ct-obj-set-field :merge-objects :ct-obj-in-type :ct-obj-copy)
 	(:use :common-lisp)
 )
 
@@ -33,6 +33,13 @@
 	nameen
 	fields		; hash
 	children)	; list
+
+(defun ct-obj-copy (o)
+ (let ((new (make-ct-obj)))
+  (setf (ct-obj-id new) (ct-obj-id o))
+  (setf (ct-obj-types new) (copy-list (ct-obj-types o)))
+  (setf (ct-obj-fields new) (copy-hash (ct-obj-fields o)))
+  new))
 
 (defun merge-objects (orig new)
 	
