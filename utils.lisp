@@ -61,7 +61,12 @@
    :merge-smart-vecs
    :get-file-ext
    :is-number-in-string
-   :is-int-in-string) 
+   :is-int-in-string
+   :tobase64
+   :frombase64
+   :pack-param
+   :unpack-param
+   ) 
   (:use :common-lisp))
 
 (in-package :utils)
@@ -403,6 +408,18 @@
                  (setf (gethash key new-table) value))
              table)
     new-table))
+
+(defun tobase64(str)
+ (cl-base64:STRING-TO-BASE64-STRING str))
+ 
+(defun frombase64 (str)
+ (cl-base64:BASE64-STRING-TO-STRING str))
+
+(defun pack-param (str)
+ (url-encode (cl-base64:USB8-ARRAY-TO-BASE64-STRING (string-to-bytes str))))
+
+(defun unpack-param (str)
+ (bytes-to-string (cl-base64:BASE64-STRING-TO-USB8-ARRAY (url-decode str))))
 
  ;(setf val nil)
 
