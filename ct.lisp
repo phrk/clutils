@@ -37,7 +37,7 @@
 (defun ct-obj-copy (o)
  (let ((new (make-ct-obj)))
   (setf (ct-obj-id new) (ct-obj-id o))
-  (setf (ct-obj-types new) (copy-list (ct-obj-types o)))
+  (setf (ct-obj-types new) (ct-obj-types o))
   (setf (ct-obj-fields new) (copy-hash (ct-obj-fields o)))
   new))
 
